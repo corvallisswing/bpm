@@ -1,0 +1,145 @@
+<html>
+<head>
+  <title>Beats per minute calculator</title>
+  <script type="text/javascript">
+
+  var timestamps   = new Array(9);
+  var currentIndex = 0;
+  var timeout;
+
+  function recordMouseDown(e)
+  {
+    clearTimeout(timeout);
+    timeout = setTimeout("reset()", 5000);
+
+    var date = new Date();
+    
+    if (currentIndex == (timestamps.length))
+    {
+      // Shift everything one cell to the left.
+      var i;
+      for (i=0; i < timestamps.length-1; i++)
+      {
+        timestamps[i] = timestamps[i+1];
+      }
+
+      currentIndex--;
+    }
+
+    timestamps[currentIndex] = date.getTime();
+
+    var x   = 60 * (currentIndex);
+    var bpm = x / ((timestamps[currentIndex] - timestamps[0]) / 1000);
+
+    if (currentIndex < timestamps.length)
+    {
+      currentIndex++;
+    }
+
+    if (isNaN(bpm)) {
+      document.getElementById('bpm').innerHTML = 'First beat ...';  
+    }
+    else {
+      document.getElementById('bpm').innerHTML = TwoDP(bpm);
+    }     
+    randomColor();
+  }
+
+  function showDebugTimestamps()
+  {
+    var s = '';
+    var i;
+    for (i=0; i < timestamps.length; i++)
+    {
+      s = s + 't[' + i + '] = ' + timestamps[i] + '<br>';
+    }
+
+    document.getElementById('debug').innerHTML = s;
+  }
+
+  function TwoDP(X) 
+  {
+      var D, C, T;
+      with (Math) {
+          D = floor(X);
+          C = round(100 * (X - D));
+          T = C % 10;
+      }    
+      return D + "." + (C - T) / 10 + T;
+  }
+
+  function reset()
+  {
+    currentIndex = 0;
+  }
+
+  function randomColor()
+  {
+    // Yes, this code sucks. No, I don't care.
+    var r = Math.floor(Math.random() * 256);
+    var g = Math.floor(Math.random() * 256);
+    var b = Math.floor(Math.random() * 256);
+
+    var rString = r.toString(16);
+    var gString = g.toString(16);
+    var bString = b.toString(16);
+
+    if (r <= 16 && rString != '10') {
+      rString = '0' + rString;
+    }
+    if (g <= 16 && gString != '10') {
+      gString = '0' + gString;
+    }
+    if (b <= 16 && bString != '10') {
+      bString = '0' + bString;
+    }
+
+    var color = '#' + rString + gString + bString;
+    document.getElementById('square').style.backgroundColor = color;
+  }
+  </script>
+
+  <style><!--
+    BODY { 
+
+    }
+
+    #container {
+      background-color: white;
+      margin-left: 3em;
+      margin-top: 1ex;
+      width: 550px;
+    }
+    P {
+      font-family: Verdana;
+      font-size: 10pt;
+    }
+
+    H3 {
+      font-family: Georgia;
+    }
+
+    #square {
+      border: 1px solid black;
+      padding: 3em;
+      text-align: center;
+    }
+--></style>
+</head>
+<body>
+  <div id="container">
+   <h3>Beats per minute calculator</h3>
+
+   <P>Click the box to the beat of your music; click it about 9 times for
+   an accurate result.</P>
+
+   <P>It will reset after 5 seconds of idle time.</P>
+
+   <p id="square" onmousedown="recordMouseDown()"></p>
+   <p>Beats per minute: <span id="bpm">0</span></p>
+
+<!--   <INPUT onclick="showDebugTimeStamps()">
+   <p id="debug"></p> -->
+  </div>
+</body>
+</html>

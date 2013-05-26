@@ -3,10 +3,9 @@
   <title>Beats per minute calculator</title>
   <script type="text/javascript">
 
-  var timestamps   = new Array(9);
-  var currentIndex = 0;
+  var timestampCount = 9;
+  var timestamps   = [];
   var timeout;
-
 
   // TODO: The main issue with this code is that the calculations
   // become unreliable when bpm is greater than 200. Either the 
@@ -19,29 +18,16 @@
 
     var date = new Date();
     
-    if (currentIndex == (timestamps.length))
-    {
-      // Shift everything one cell to the left.
-      var i;
-      for (i=0; i < timestamps.length-1; i++)
-      {
-        timestamps[i] = timestamps[i+1];
-      }
-
-      currentIndex--;
+    timestamps.push(date.getTime());
+    if (timestamps.length > timestampCount) {
+      timestamps.shift();
     }
 
-    timestamps[currentIndex] = date.getTime();
+    var lastIndex = timestamps.length - 1;
+    var x   = 60 * lastIndex;
+    var bpm = x / ((timestamps[lastIndex] - timestamps[0]) / 1000);
 
-    var x   = 60 * (currentIndex);
-    var bpm = x / ((timestamps[currentIndex] - timestamps[0]) / 1000);
-
-    if (currentIndex < timestamps.length)
-    {
-      currentIndex++;
-    }
-
-    if (isNaN(bpm)) {
+    if (timestamps.length === 1) {
       document.getElementById('bpm').innerHTML = 'First beat ...';  
     }
     else {
@@ -50,7 +36,7 @@
     randomColor();
   }
 
-  function showDebugTimestamps()
+  function showDebugTimeStamps()
   {
     var s = '';
     var i;
@@ -75,7 +61,7 @@
 
   function reset()
   {
-    currentIndex = 0;
+    timestamps = [];
   }
 
   function randomColor()
@@ -143,7 +129,7 @@
    <p id="square" onmousedown="recordMouseDown()"></p>
    <p>Beats per minute: <span id="bpm">0</span></p>
 
-<!--   <INPUT onclick="showDebugTimeStamps()">
+<!-- <INPUT onclick="showDebugTimeStamps()" type="button">
    <p id="debug"></p> -->
   </div>
 </body>

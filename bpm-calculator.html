@@ -3,15 +3,11 @@
   <title>Beats per minute calculator</title>
   <script type="text/javascript">
 
-  var timestampCount = 9;
+  var timestampCount = 32;
   var timestamps   = [];
   var timeout;
 
-  // TODO: The main issue with this code is that the calculations
-  // become unreliable when bpm is greater than 200. Either the 
-  // event loop can't keep up, the granularity of Date is not fine
-  // enough, or something else is amiss.
-  function recordMouseDown(e)
+  function recordBeat(e)
   {
     clearTimeout(timeout);
     timeout = setTimeout("reset()", 5000);
@@ -20,12 +16,20 @@
     
     timestamps.push(date.getTime());
     if (timestamps.length > timestampCount) {
-      timestamps.shift();
+      // slice() is about twice as fast as shift().
+      timestamps = timestamps.slice(1);
     }
 
-    var lastIndex = timestamps.length - 1;
-    var x   = 60 * lastIndex;
-    var bpm = x / ((timestamps[lastIndex] - timestamps[0]) / 1000);
+    // Due to the inconsistency of the javascript timer,
+    // calculate an average diff time by taking the time
+    // between the first and last click, divided by the total
+    // number of diffs. (where a diff requires two timestamps) 
+    var lastIndex = timestamps.length-1;
+    var diffCount = lastIndex;
+    var avgDiffTime = (timestamps[lastIndex] - timestamps[0]) / diffCount;
+
+    var oneMinute = 60 * 1000;
+    var bpm = oneMinute / avgDiffTime;
 
     if (timestamps.length === 1) {
       document.getElementById('bpm').innerHTML = 'First beat ...';  
@@ -88,6 +92,8 @@
     var color = '#' + rString + gString + bString;
     document.getElementById('square').style.backgroundColor = color;
   }
+
+  document.onkeypress = recordBeat;
   </script>
 
   <style><!--
@@ -121,12 +127,12 @@
   <div id="container">
    <h3>Beats per minute calculator</h3>
 
-   <P>Click the box to the beat of your music; click it about 9 times for
-   an accurate result.</P>
+   <P>Click the box to the beat of your music. Click it about 10 times for
+   an accurate result for slower songs; for faster songs, about 40 times.</P>
 
    <P>It will reset after 5 seconds of idle time.</P>
 
-   <p id="square" onmousedown="recordMouseDown()"></p>
+   <p id="square" onmousedown="recordBeat()"></p>
    <p>Beats per minute: <span id="bpm">0</span></p>
 
 <!-- <INPUT onclick="showDebugTimeStamps()" type="button">

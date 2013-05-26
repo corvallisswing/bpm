@@ -7,11 +7,7 @@
   var timestamps   = [];
   var timeout;
 
-  function recordBeat(e)
-  {
-    clearTimeout(timeout);
-    timeout = setTimeout("reset()", 5000);
-
+  function recordBeat(e) {
     var date = new Date();
     
     timestamps.push(date.getTime());
@@ -31,17 +27,58 @@
     var oneMinute = 60 * 1000;
     var bpm = oneMinute / avgDiffTime;
 
+    var result; 
     if (timestamps.length === 1) {
-      document.getElementById('bpm').innerHTML = 'First beat ...';  
+      result = 'First beat ...';
     }
     else {
-      document.getElementById('bpm').innerHTML = bpm.toFixed(2);
-    }     
-    randomColor();
+      result = bpm.toFixed(2);
+    }
+
+    updateBpm(result);
   }
 
-  function showDebugTimeStamps()
-  {
+  function updateBpm(bpm) {
+    clearTimeout(timeout);
+    timeout = setTimeout("resetTimestamps()", 5000);
+
+    setBpmText(bpm);
+    setSquareColor(getRandomColor());
+  }
+
+  function resetTimestamps() {
+    timestamps = [];
+  }
+
+  function setBpmText(text) {
+    document.getElementById('bpm').innerHTML = text;
+  }
+
+  function setSquareColor(color) {
+    document.getElementById('square').style.backgroundColor = color;
+  }
+
+  function getRandomColor() {
+
+    var getRandomHexString = function() {
+      var decimalVal = Math.floor(Math.random() * 256);
+      var hexString = decimalVal.toString(16);
+      if (decimalVal <= 15) {
+        hexString = "0" + hexString;
+      }
+      return hexString;
+    }
+
+    var color = '#' + 
+      getRandomHexString() +
+      getRandomHexString() +
+      getRandomHexString();
+
+    return color;
+  }
+
+
+  function showDebugTimestamps() {
     var s = '';
     var i;
     for (i=0; i < timestamps.length; i++)
@@ -52,56 +89,23 @@
     document.getElementById('debug').innerHTML = s;
   }
 
-  function reset()
-  {
-    timestamps = [];
-  }
-
-  function randomColor()
-  {
-    // TODO: Clean up this code if you feel so inclined.
-    var r = Math.floor(Math.random() * 256);
-    var g = Math.floor(Math.random() * 256);
-    var b = Math.floor(Math.random() * 256);
-
-    var rString = r.toString(16);
-    var gString = g.toString(16);
-    var bString = b.toString(16);
-
-    if (r <= 16 && rString != '10') {
-      rString = '0' + rString;
-    }
-    if (g <= 16 && gString != '10') {
-      gString = '0' + gString;
-    }
-    if (b <= 16 && bString != '10') {
-      bString = '0' + bString;
-    }
-
-    var color = '#' + rString + gString + bString;
-    document.getElementById('square').style.backgroundColor = color;
-  }
 
   document.onkeypress = recordBeat;
   </script>
 
   <style><!--
-    BODY { 
-
-    }
-
     #container {
       background-color: white;
       margin-left: 3em;
       margin-top: 1ex;
       width: 550px;
     }
-    P {
+    p {
       font-family: Verdana;
       font-size: 10pt;
     }
 
-    H3 {
+    h3 {
       font-family: Georgia;
     }
 
@@ -116,15 +120,15 @@
   <div id="container">
    <h3>Beats per minute calculator</h3>
 
-   <P>Click the box to the beat of your music. Click it about 10 times for
-   an accurate result for slower songs; for faster songs, about 40 times.</P>
+   <p>Click the box to the beat of your music. Click it about 10 times for
+   an accurate result for slower songs; for faster songs, about 40 times.</p>
 
-   <P>It will reset after 5 seconds of idle time.</P>
+   <p>It will reset after 5 seconds of idle time.</p>
 
    <p id="square" onmousedown="recordBeat()"></p>
    <p>Beats per minute: <span id="bpm">0</span></p>
 
-<!-- <INPUT onclick="showDebugTimeStamps()" type="button">
+<!-- <INPUT onclick="showDebugTimestamps()" type="button">
    <p id="debug"></p> -->
   </div>
 </body>

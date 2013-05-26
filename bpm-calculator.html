@@ -7,6 +7,11 @@
   var currentIndex = 0;
   var timeout;
 
+
+  // TODO: The main issue with this code is that the calculations
+  // become unreliable when bpm is greater than 200. Either the 
+  // event loop can't keep up, the granularity of Date is not fine
+  // enough, or something else is amiss.
   function recordMouseDown(e)
   {
     clearTimeout(timeout);
@@ -75,7 +80,7 @@
 
   function randomColor()
   {
-    // Yes, this code sucks. No, I don't care.
+    // TODO: Clean up this code if you feel so inclined.
     var r = Math.floor(Math.random() * 256);
     var g = Math.floor(Math.random() * 256);
     var b = Math.floor(Math.random() * 256);
